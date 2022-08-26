@@ -5,9 +5,20 @@
   "main": "index.js",
   "scripts": {
     "compile_circuit": "mkdir -p output && pushd output && circom ../circuit.circom --r1cs --wasm --sym; popd",
-    "snarkjs_constraints": "snarkjs rp output/circuit.r1cs output/circuit.sym",
-    "snarkjs_info": "snarkjs info -r output/circuit.r1cs",
-    "snarkjs_calculate_witness": "pushd output && snarkjs wc circuit.wasm ../input.json && snarkjs wej witness.wtns; popd"
+    "show_constraints": "snarkjs rp output/circuit.r1cs output/circuit.sym",
+    "show_info": "snarkjs info -r output/circuit.r1cs",
+    "calculate_witness": "pushd output && snarkjs wc circuit.wasm ../input.json && snarkjs wej witness.wtns; popd",
+    "pot_new": "snarkjs powersoftau new bn128 12 output/pot12_0000.ptau -v",
+    "pot_contribute": "snarkjs powersoftau contribute output/pot12_0000.ptau output/pot12_0001.ptau --name=\"First contribution\" -v",
+    "pot_prepare_phase2": "snarkjs powersoftau prepare phase2 output/pot12_0001.ptau output/pot12_final.ptau -v",
+    "pot_gen_key": "snarkjs groth16 setup output/circuit.r1cs output/pot12_final.ptau output/circuit_0000.zkey",
+    "pot_contribute_phase2": "snarkjs zkey contribute output/circuit_0000.zkey output/circuit_0001.zkey --name=\"1st Contributor Name\" -v",
+    "pot_export_key": "snarkjs zkey export verificationkey output/circuit_0001.zkey output/verification_key.json",
+    "proof": "snarkjs groth16 prove output/circuit_0001.zkey output/witness.wtns output/proof.json output/public.json",
+    "verify": "snarkjs groth16 verify output/verification_key.json output/public.json output/proof.json",
+    "verify_solidity": "snarkjs zkey export solidityverifier output/circuit_0001.zkey output/verifier.sol",
+    "solidity_calldata": "snarkjs zkesc output/public.json output/proof.json"
+
   },
   "author": "",
   "license": "ISC",
